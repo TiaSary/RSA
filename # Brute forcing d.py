@@ -91,7 +91,7 @@ def modular_inverse(e, phi_n):
 
 
 def encryption(message,public_key):
-    n, e = public_key
+    e, n = public_key
     cipher = pow(message, e, n)
     return cipher
 
@@ -104,15 +104,15 @@ def decryption(cipher,private_key):
 
 
 
-
 # Public and private key generation
 bit_length= int(input("Enter bit length: "))
 public_key, private_key = generate_rsa_keys(bit_length)
 print("Public Key (e, n):", public_key)
 print("Private Key (d, n):", private_key)
 
-
-
-
-
-# Brute forcing d
+message= int(input("Enter message to encrypt: "))
+cipher = encryption(message,public_key)
+dmessage= decryption(cipher,private_key)
+print("original message: ", message)
+print("cipher: ", cipher)
+print("decrypted message: ", dmessage)
