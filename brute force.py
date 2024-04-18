@@ -1,8 +1,6 @@
 import random
 import math
 
-
-# Function that generates public and private keys
 def generate_rsa_keys(bit_length):
     
     p = generate_prime_number(bit_length // 2)
@@ -18,7 +16,7 @@ def generate_rsa_keys(bit_length):
     return public_key, private_key
 
 
-# Function that generates prime numbers
+
 def generate_prime_number(bit_length):
     while True:
         candidate = random.getrandbits(bit_length)
@@ -26,7 +24,7 @@ def generate_prime_number(bit_length):
             return candidate
 
 
-# Function that makes sure a number is prime
+
 def is_prime(n, k=5):
    
     if n <= 1:
@@ -109,23 +107,15 @@ def decryption(cipher,private_key):
 # Public and private key generation
 bit_length= int(input("Enter bit length: "))
 public_key, private_key = generate_rsa_keys(bit_length)
-d, n = private_key
-e, n = public_key
-print('e: ', e)
-print('n: ', n)
-print('d: ', d)
+print("Public Key (e, n):", public_key)
+print("Private Key (d, n):", private_key)
 
-
-
-# Brute forcing d
 message= int(input("Enter message to encrypt: "))
 cipher = encryption(message,public_key)
+dmessage= decryption(cipher,private_key)
+print("original message: ", message)
+print("cipher: ", cipher)
+print("decrypted message: ", dmessage)
+print(d)
 
-p, q = 0, 0
-while p*q != n:
-    p = generate_prime_number(bit_length)
-    q = n//p
 
-phi_n = (p - 1) * (q - 1)
-d = modular_inverse(e, phi_n)
-print("d: ", d)
