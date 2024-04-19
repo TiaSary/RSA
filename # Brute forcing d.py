@@ -2,23 +2,23 @@ import random
 import math
 
 
-# Function that generates public and private keys
 def generate_rsa_keys(bit_length):
-    
-    p = generate_prime_number(bit_length // 2)
-    q = generate_prime_number(bit_length // 2)
-    n = p * q
-    phi_n = (p - 1) * (q - 1)
-    e = choose_public_exponent(phi_n)
-    d = modular_inverse(e, phi_n)
+    while True:
+        p = generate_prime_number(bit_length // 2)
+        q = generate_prime_number(bit_length // 2)
+        n = p * q
+        phi_n = (p - 1) * (q - 1)
+        e = choose_public_exponent(phi_n)
+        d = modular_inverse(e, phi_n)
 
-    public_key = (e, n)
-    private_key = (d, n)
-    
-    return public_key, private_key
+        public_key = (e, n)
+        private_key = (d, n)
+        
+        if public_key != private_key:
+            return public_key, private_key
 
 
-# Function that generates prime numbers
+
 def generate_prime_number(bit_length):
     while True:
         candidate = random.getrandbits(bit_length)
@@ -26,7 +26,7 @@ def generate_prime_number(bit_length):
             return candidate
 
 
-# Function that makes sure a number is prime
+
 def is_prime(n, k=5):
    
     if n <= 1:
@@ -42,7 +42,7 @@ def is_prime(n, k=5):
     while d % 2 == 0:
         d //= 2
         r += 1
-
+    
     def miller_rabin_test(a):
         x = pow(a, d, n)
         if x == 1 or x == n - 1:
@@ -59,8 +59,6 @@ def is_prime(n, k=5):
             return False
     
     return True
-
-
 
 def choose_public_exponent(phi_n):
  
@@ -92,40 +90,56 @@ def modular_inverse(e, phi_n):
 
 
 
-def encryption(message,public_key):
-    e, n = public_key
+def encryption(message, public_key):
+    e, n= public_key
+    if message >= n:
+        raise ValueError("Message should be less than n for encryption.")
     cipher = pow(message, e, n)
     return cipher
 
 
 
-def decryption(cipher,private_key):
-    d, n = private_key
-    message = pow(cipher, d, n)
-    return message
+def decryption(cipher, private_key):
+    d,n = private_key
+    decrypted_message = pow(cipher, d, n)
+    return decrypted_message
 
 
 
-# Public and private key generation
-bit_length= int(input("Enter bit length: "))
+# Testing the RSA encryption and decryption
+bit_length = int(input("Enter bit length for RSA key generation: "))
 public_key, private_key = generate_rsa_keys(bit_length)
-d, n = private_key
-e, n = public_key
+
+print("Public Key (e, n):", public_key)
+print("Private Key (d, n):", private_key)
+
+message = int(input("Enter message to encrypt (must be less than n): "))
+cipher = encryption(message, public_key)
+print("Encrypted message:", cipher)
+
+decrypted_message = decryption(cipher, private_key)
+print("Decrypted message:", decrypted_message)
+
+e,n = public_key
+d,n = private_key
+
 print('e: ', e)
 print('n: ', n)
 print('d: ', d)
 
 
 
-# Brute forcing d
-message= int(input("Enter message to encrypt: "))
-cipher = encryption(message,public_key)
 
-p, q = 0, 0
-while p*q != n:
-    p = generate_prime_number(bit_length)
-    q = n//p
+d2 = 0
+private_key2 = (d2,n)
+message2 = decryption(cipher,private_key2)
 
-phi_n = (p - 1) * (q - 1)
-d = modular_inverse(e, phi_n)
-print("d: ", d)
+while message != message2:
+    d2 = d2 + 1
+    private_key2 = (d2,n)
+    message2 = decryption(cipher,private_key2)
+
+print("d: ",d)
+print("d2: ",d2)
+
+
