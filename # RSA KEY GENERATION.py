@@ -10,7 +10,7 @@ def generate_rsa_keys(bit_length):
     n = p * q
     phi_n = (p - 1) * (q - 1)
     e = choose_public_exponent(phi_n)
-    d = modular_inverse(e, phi_n)
+    d = pow(e, -1, phi_n)
 
     public_key = (e, n)
     private_key = (d, n)
@@ -63,22 +63,7 @@ def choose_public_exponent(phi_n):
         e = random.randrange(2, phi_n)
     return e
 
-def extended_euclidean_algorithm(a, b):
-    
-    if b == 0:
-        return a, 1, 0
-    gcd, x1, y1 = extended_euclidean_algorithm(b, a % b)
-    x = y1
-    y = x1 - (a // b) * y1
-    return gcd, x, y
 
-def modular_inverse(e, phi_n):
- 
-    gcd, x, _ = extended_euclidean_algorithm(e, phi_n)
-    if gcd == 1:
-        return x % phi_n
-    else:
-        raise ValueError("No modular inverse exists")
 
 bit_length = int(input("Enter bit length: "))
 public_key, private_key = generate_rsa_keys(bit_length)
