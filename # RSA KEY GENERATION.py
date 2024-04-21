@@ -1,59 +1,88 @@
 # RSA KEY GENERATION
 
-import math
 import random
+import math
 
-def is_prime(n):
+def generate_rsa_keys(bit_length):
+    
+    p = generate_prime_number(bit_length // 2)
+    q = generate_prime_number(bit_length // 2)
+    n = p * q
+    phi_n = (p - 1) * (q - 1)
+    e = choose_public_exponent(phi_n)
+    d = modular_inverse(e, phi_n)
+
+    public_key = (e, n)
+    private_key = (d, n)
+    
+    return public_key, private_key
+
+def generate_prime_number(bit_length):
+    while True:
+        candidate = random.getrandbits(bit_length)
+        if is_prime(candidate):
+            return candidate
+
+def is_prime(n, k=5):
+   
     if n <= 1:
         return False
     if n <= 3:
         return True
-    if n % 2 == 0 or n % 3 == 0:
+    if n % 2 == 0:
         return False
-    i = 5
-    while i * i <= n:
-        if n % i == 0 or n % (i + 2) == 0:
+    
+   
+    r = 0
+    d = n - 1
+    while d % 2 == 0:
+        d //= 2
+        r += 1
+    
+    def miller_rabin_test(a):
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            return True
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                return True
+        return False
+    
+    for _ in range(k):
+        a = random.randrange(2, n - 1)
+        if not miller_rabin_test(a):
             return False
-        i += 6
+    
     return True
 
-def gcd(a, b):
-    while b:
-        a, b = b, a % b
-    return a
+def choose_public_exponent(phi_n):
+ 
+    e = random.randrange(2, phi_n)
+    while math.gcd(e, phi_n) != 1:
+        e = random.randrange(2, phi_n)
+    return e
 
-def generate_prime_number(bits):
-    while True:
-        num = random.getrandbits(bits)
-        if is_prime(num):
-            return num
+def extended_euclidean_algorithm(a, b):
+    
+    if b == 0:
+        return a, 1, 0
+    gcd, x1, y1 = extended_euclidean_algorithm(b, a % b)
+    x = y1
+    y = x1 - (a // b) * y1
+    return gcd, x, y
 
-def generate_rsa_key_pair(bits):
-    # Generate random prime numbers
-    p = generate_prime_number(bits//2)
-    q = generate_prime_number(bits//2)
+def modular_inverse(e, phi_n):
+ 
+    gcd, x, _ = extended_euclidean_algorithm(e, phi_n)
+    if gcd == 1:
+        return x % phi_n
+    else:
+        raise ValueError("No modular inverse exists")
 
-    # Calculate n and phi(n)
-    n = p * q
-    phi_n = (p - 1) * (q - 1)
-
-    # Choose a random e that is coprime with phi(n)
-    e = random.randint(2, phi_n - 1)
-    while gcd(e, phi_n) != 1:
-        e = random.randint(2, phi_n - 1)
-
-    # Calculate d as the modular inverse of e
-    d = pow(e, -1, phi_n)
-
-    # Return the public and private keys
-    return ((e, n), (d, n))
-
-# Generate RSA key pair
-bits = int(input("Enter bit length: "))
-public_key, private_key = generate_rsa_key_pair(bits)
-while public_key == private_key:
-    public_key, private_key = generate_rsa_key_pair(bits)
-
-# Print the keys
+bit_length = int(input("Enter bit length: "))
+public_key, private_key = generate_rsa_keys(bit_length)
 print("Public Key (e, n):", public_key)
 print("Private Key (d, n):", private_key)
+
+
