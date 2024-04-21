@@ -10,14 +10,12 @@ def decrypt_message(ciphertext, d, n):
 
 
 
-original_message1 = int(input("Enter message 1: "))
 e = int(input("Enter e: "))
 n = int(input("Enter n: "))
+
+
+original_message1 = 15
 encrypted_message1 = pow(original_message1, e, n)
-
-print("Message 1: ", original_message1)
-print("Encrypted message 1: ", encrypted_message1)
-
 original_message2 = 14
 encrypted_message2 = pow(original_message2, e, n)
 
@@ -55,10 +53,15 @@ while d1 != d2 or calculated_message1 != original_message1 or calculated_message
         calculated_message1 = decrypt_message(encrypted_message1, d1, n)
         calculated_message2 = decrypt_message(encrypted_message2, d2, n)
 
-end_time = time.time()
 
+end_time = time.time()
 time_taken = (end_time - start_time) * 1000
 
 
 print("Brute forced d: ", d1)
 print("Time taken: ", time_taken, " milliseconds")
+
+print(original_message1)
+print(calculated_message1)
+print(original_message2)
+print(calculated_message2)
